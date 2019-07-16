@@ -8,7 +8,11 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -21,6 +25,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLException;
@@ -55,6 +61,7 @@ public class AsyncTaskActivity extends AppCompatActivity {
                 if (validPins.contains(pin)) {
                     Log.d(tag, "validPins = " + validPins);
                     Log.d(tag, "pin       = " + pin);
+                    Log.d(tag, "response = " + getJSON("https://api.github.com/", 10000));
                     return;
                 }
             }
@@ -77,6 +84,49 @@ public class AsyncTaskActivity extends AppCompatActivity {
         }
     }
 
+    public String getJSON(String url, int timeout) {
+        HttpURLConnection c = null;
+        try {
+            URL u = new URL(url);
+            c = (HttpURLConnection) u.openConnection();
+            c.setRequestMethod("GET");
+            c.setRequestProperty("Content-length", "0");
+            c.setUseCaches(false);
+            c.setAllowUserInteraction(false);
+            c.setConnectTimeout(timeout);
+            c.setReadTimeout(timeout);
+            c.connect();
+            int status = c.getResponseCode();
+
+            switch (status) {
+                case 200:
+                case 201:
+                    BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line + "\n");
+                    }
+                    br.close();
+                    return sb.toString();
+            }
+
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            if (c != null) {
+                try {
+                    c.disconnect();
+                } catch (Exception ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        return null;
+    }
+
     private class DemoAsyncTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
@@ -94,11 +144,12 @@ public class AsyncTaskActivity extends AppCompatActivity {
                     }
                 }
                 X509TrustManagerExtensions trustManagerExt = new X509TrustManagerExtensions(x509TrustManager);
-                URL url = new URL("https://www.github.com/");
+                URL url = new URL("https://api.github.com/");
                 HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.connect();
+
                 //urlConnection.getInputStream();              //Vjs8r4z+80wjNcr1YKepWQboSIRi63WsWXhIMN+eWys=
-                Set<String> validPins = validPins =Collections.singleton("WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18=");
+                Set<String> validPins = Collections.singleton("WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18=");
 
                 validatePinning(trustManagerExt, urlConnection, validPins);
             } catch (SSLException e) {
@@ -110,7 +161,6 @@ public class AsyncTaskActivity extends AppCompatActivity {
             } catch (NoSuchAlgorithmException e) {
                 Log.d(tag, "(NoSuchAlgorithmException) catch error = " + e.getMessage());
             }
-
             return null;
         }
     }

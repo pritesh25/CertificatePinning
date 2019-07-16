@@ -72,7 +72,8 @@ public class RetrofitMainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Toast.makeText(RetrofitMainActivity.this, "SSL error?", Toast.LENGTH_SHORT).show();
+                Log.d(tag, "SSL error = " + t.getMessage());
+                Toast.makeText(RetrofitMainActivity.this, "SSL error = " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
