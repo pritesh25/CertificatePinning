@@ -1,5 +1,6 @@
 package com.example.certificateissue;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -7,40 +8,45 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManagerFactory;
 
 public class ProjectCertificateActivity extends AppCompatActivity {
 
     private String tag = this.getClass().getSimpleName();
-    private String domainname = "https://api.github.com/";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_project_certificate);
 
-        postSSL();
+        new DemoAsyncTask().execute();
+
     }
 
     private void postSSL() {
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             InputStream inputStream = new BufferedInputStream(getAssets().open("github.crt"));
+
 
             Certificate ca = cf.generateCertificate(inputStream);
             inputStream.close();
@@ -63,8 +69,12 @@ public class ProjectCertificateActivity extends AppCompatActivity {
                 public boolean verify(String hostname, SSLSession session) {
 
                     HostnameVerifier hv = HttpsURLConnection.getDefaultHostnameVerifier();
-                    if (hostname.contains("github.com"))
+                    if (hostname.contains("github.com")) {
+                        Log.d(tag, "if executed , hostname = " + hostname);
                         return true;
+                    } else {
+                        Log.d(tag, "else executed");
+                    }
 
                     return hv.verify("github.com", session);
                 }
@@ -72,25 +82,33 @@ public class ProjectCertificateActivity extends AppCompatActivity {
 
 
             // Tell the URLConnection to use a SocketFactory from our SSLContext
-            URL url1 = new URL("https://github.com/");
+            URL url1 = new URL("https://api.github.com");
             HttpsURLConnection urlConnection = (HttpsURLConnection) url1.openConnection();
             urlConnection.setHostnameVerifier(hostnameVerifier);
             urlConnection.setSSLSocketFactory(new xxtlsskt());
 
-            urlConnection.setRequestMethod("POST");
-            urlConnection.setDoInput(true);
-            urlConnection.setDoOutput(true);
+            urlConnection.setRequestMethod("GET");
 
-            OutputStream os = urlConnection.getOutputStream();
+            //https://stackoverflow.com/questions/29558759/what-is-the-use-of-httpurlconnection-classs-setdooutput-setdoinput-methods
+            //urlConnection.setDoInput(true);
+            //urlConnection.setDoOutput(true);
+
+            //below line for POST method
+
+            /*OutputStream os = urlConnection.getOutputStream();
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
             writer.write("");
             writer.flush();
             writer.close();
-            os.close();
+            os.close();*/
 
             // POST PARAMETERS
             if (urlConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 int response = urlConnection.getResponseCode();
+                Log.d(tag, "if response code = " + response);
+            } else {
+                int response = urlConnection.getResponseCode();
+                Log.d(tag, "else response code = " + response);
             }
 
             InputStream inputStream1 = urlConnection.getInputStream();
@@ -103,8 +121,31 @@ public class ProjectCertificateActivity extends AppCompatActivity {
 
             Log.d(tag, "response = " + response);
 
-        } catch (Exception e) {
-            Log.d(tag, "(Exception) catch error = " + e.getMessage());
+            urlConnection.disconnect();
+
+
+        } catch (SSLException e) {
+            Log.d(tag, "(SSLException) catch error = " + e.getMessage());
+        } catch (IOException e) {
+            Log.d(tag, "(IOException) catch error = " + e.getMessage());
+        } catch (KeyStoreException e) {
+            Log.d(tag, "(KeyStoreException) catch error = " + e.getMessage());
+        } catch (NoSuchAlgorithmException e) {
+            Log.d(tag, "(NoSuchAlgorithmException) catch error = " + e.getMessage());
+        } catch (CertificateException e) {
+            Log.d(tag, "(CertificateException) catch error = " + e.getMessage());
+        } catch (KeyManagementException e) {
+            Log.d(tag, "(KeyManagementException) catch error = " + e.getMessage());
+        }
+    }
+
+    private class DemoAsyncTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            postSSL();
+
+            return null;
         }
     }
 

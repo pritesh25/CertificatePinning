@@ -14,8 +14,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <!--<activity android:name=".ProjectCertificateActivity"></activity>-->
-        <!-- <activity android:name=".AsyncTaskActivity"></activity> -->
-        <activity android:name=".AsyncTaskActivity">
+        <activity android:name=".ProjectCertificateActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
