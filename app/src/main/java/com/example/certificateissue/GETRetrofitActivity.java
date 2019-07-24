@@ -19,7 +19,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 
-public class RetrofitMainActivity extends AppCompatActivity {
+public class GETRetrofitActivity extends AppCompatActivity {
 
     private String tag = this.getClass().getSimpleName();
 
@@ -67,13 +67,13 @@ public class RetrofitMainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                Toast.makeText(RetrofitMainActivity.this, "got response", Toast.LENGTH_SHORT).show();
+                Toast.makeText(GETRetrofitActivity.this, "got response", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.d(tag, "SSL error = " + t.getMessage());
-                Toast.makeText(RetrofitMainActivity.this, "SSL error = " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(GETRetrofitActivity.this, "SSL error = " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

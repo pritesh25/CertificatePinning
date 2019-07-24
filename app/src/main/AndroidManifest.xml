@@ -13,8 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <!--<activity android:name=".ProjectCertificateActivity"></activity>-->
-        <activity android:name=".ProjectCertificateActivity">
+        <!--<activity android:name=".GETHttpUrlConnectionActivity"></activity>-->
+        <activity android:name=".GETHttpUrlConnectionActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

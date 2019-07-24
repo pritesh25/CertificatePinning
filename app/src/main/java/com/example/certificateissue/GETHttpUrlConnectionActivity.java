@@ -28,7 +28,7 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManagerFactory;
 
-public class ProjectCertificateActivity extends AppCompatActivity {
+public class GETHttpUrlConnectionActivity extends AppCompatActivity {
 
     private String tag = this.getClass().getSimpleName();
 
@@ -46,7 +46,6 @@ public class ProjectCertificateActivity extends AppCompatActivity {
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             InputStream inputStream = new BufferedInputStream(getAssets().open("github.crt"));
-
 
             Certificate ca = cf.generateCertificate(inputStream);
             inputStream.close();
@@ -148,23 +147,4 @@ public class ProjectCertificateActivity extends AppCompatActivity {
             return null;
         }
     }
-
-/*    private String getQuery(List<NameValuePair> params) throws UnsupportedEncodingException {
-        StringBuilder result = new StringBuilder();
-        boolean first = true;
-
-        for (NameValuePair pair : params) {
-            if (first)
-                first = false;
-            else
-                result.append("&");
-
-            result.append(URLEncoder.encode(pair.getName(), "UTF-8"));
-            result.append("=");
-            result.append(URLEncoder.encode(pair.getValue(), "UTF-8"));
-        }
-
-        return result.toString();
-    }*/
-
 }
